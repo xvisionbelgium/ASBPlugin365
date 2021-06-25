@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.2.0" />
+    <PackageReference Include="ILRepack" Version="2.0.18" />
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.34" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <InputAssemblies Include="$(TargetPath)" />
+            <InputAssemblies Include="$(TargetDir)Newtonsoft.Json.dll" />
+			<InputAssemblies Include="$(TargetDir)Microsoft.Azure.*.dll" />
+			<InputAssemblies Include="$(TargetDir)Microsoft.Bcl.*.dll" />
+			<InputAssemblies Include="$(TargetDir)Azure.Core.*.dll" />
+			<InputAssemblies Include="$(TargetDir)Azure.Messaging.*.dll" />
+		
+        </ItemGroup>
+        <ItemGroup>
+            <KeyFile Include="$(ProjectDir)key.snk" />
+        </ItemGroup>
+        <Exec Command="$(ILRepack) /keyfile:@(KeyFile) /parallel /out:$(TargetPath) /lib:$(TargetDir) @(InputAssemblies -> '%(Identity)', ' ')" />
+    </Target>
+
+
+</Project>
